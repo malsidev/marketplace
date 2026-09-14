@@ -1,0 +1,63 @@
+package handler
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"auth/internal/service"
+)
+
+type AuthHandler struct {
+	authService *service.AuthService
+}
+
+type RegisterRequest struct {
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message"`
+}
+
+func NewAuthHundler(authService *service.AuthService) *AuthHandler {
+	return &AuthHandler{
+		authService: authService,
+	}
+}
+
+func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var request RegisterRequest
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		json.NewEncoder(w).Encode(MessageResponse{
+			Message: "invalid JSON",
+		})
+
+		return
+	}
+
+	err = &h.authService.Register(request.Phone, request.Password)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		json.NewEncoder(w).Encode(MessageResponse{
+			Message: err.Error(),
+		})
+
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(MessageResponse{
+		Message: "user registered",
+	})
+}

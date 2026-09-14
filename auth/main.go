@@ -1,37 +1,55 @@
-package main 
+package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"encoding/json"
 	"unicode"
+
+	"github.com/go-chi/chi/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type RegisterRequest struct {
-	Phone string `json:"phone"`
+	Phone    string `json:"phone"`
 	Password string `json:"password"`
 }
 
+type MessageResponse struct {
+	Message string `json:"message"`
+}
 
 func main() {
-	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/register", registerHandler)
+	r := chi.NewRouter()
+
+	r.Use(loggerMiddleware)
+
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/auth/reg", registerHandler)
+	})
 
 	fmt.Println("server started on : 8000")
 
-	err := http.ListenAndServe(":8000", nil)
+	err := http.ListenAndServe(":8000", r)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
+//	func rootHandler(w http.ResponseWriter, r *http.Request) {
+//		fmt.Fprintln(w, map[string]string{"message": "ok"})
+//	}
+func loggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Request:", r.Method, r.URL.Path)
 
-func rootHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintln(w, map[string]string{"message": "ok"})
+		next.ServeHTTP(w, r)
+	})
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
 	var request RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -52,10 +70,18 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hashedPassword, err := hashPassword(request.Password)
+	if err != nil {
+		fmt.Fprintln(w, err)
+		return
+	}
 
 	fmt.Fprintln(w, "successfully")
+	fmt.Fprintln(w, "hashed password", hashedPassword)
 
-	
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(MessageResponse{Message: "user registered"})
+
 }
 
 func validatePhone(phone string) error {
@@ -73,7 +99,7 @@ func validatePassword(password string) error {
 	hasDigit := false
 
 	for _, r := range password {
-		if unicode.IsDigit(r){
+		if unicode.IsDigit(r) {
 			hasDigit = true
 		}
 	}
@@ -83,4 +109,15 @@ func validatePassword(password string) error {
 	}
 
 	return nil
+}
+
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword(
+		[]byte(password), bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hash), nil
 }
