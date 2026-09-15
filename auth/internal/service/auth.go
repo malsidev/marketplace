@@ -1,18 +1,17 @@
-package sevice
-
+package service
 
 import (
 	"fmt"
 
-	"golang.org/x/crypto/bcrypt"
 	"unicode"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-
 }
 
-func NewAuthService() *AuthService{
+func NewAuthService() *AuthService {
 	return &AuthService{}
 }
 
@@ -37,7 +36,7 @@ func (s *AuthService) Register(phone string, password string) error {
 		return fmt.Errorf("There must be at least one digit.")
 	}
 
-		_, err := bcrypt.GenerateFromPassword(
+	_, err := bcrypt.GenerateFromPassword(
 		[]byte(password),
 		bcrypt.DefaultCost,
 	)

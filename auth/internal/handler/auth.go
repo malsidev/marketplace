@@ -43,7 +43,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = &h.authService.Register(request.Phone, request.Password)
+	err = h.authService.Register(request.Phone, request.Password)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

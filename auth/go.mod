@@ -1,4 +1,4 @@
-module marketplace
+module auth
 
 go 1.26.0
 
