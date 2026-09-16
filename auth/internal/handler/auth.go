@@ -20,7 +20,7 @@ type MessageResponse struct {
 	Message string `json:"message"`
 }
 
-func NewAuthHundler(authService *service.AuthService) *AuthHandler {
+func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
 	}
@@ -32,7 +32,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -44,7 +43,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.authService.Register(request.Phone, request.Password)
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 

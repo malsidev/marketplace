@@ -1,21 +1,38 @@
 package service
 
 import (
+	"errors"
 	"fmt"
+	"gorm.io/gorm"
 
 	"unicode"
-
+	"auth/internal/model"
 	"golang.org/x/crypto/bcrypt"
+	"auth/internal/repository"
 )
 
 type AuthService struct {
+	userRepository *repository.UserRepository
 }
 
-func NewAuthService() *AuthService {
-	return &AuthService{}
+func NewAuthService(userRepository *repository.UserRepository) *AuthService {
+	return &AuthService{
+		userRepository: userRepository,
+	}
 }
 
 func (s *AuthService) Register(phone string, password string) error {
+	user, err := s.userRepository.GetByPhone(phone)
+
+	if err == nil {
+		return fmt.Errorf("the phone number is busy")
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		// Это уже настоящая ошибка базы данных
+		return fmt.Errorf("failed to check phone: %w", err)
+	}
+
 	if len(phone) != 11 {
 		return fmt.Errorf("phone number must be 11 digits")
 	}
@@ -36,7 +53,7 @@ func (s *AuthService) Register(phone string, password string) error {
 		return fmt.Errorf("There must be at least one digit.")
 	}
 
-	_, err := bcrypt.GenerateFromPassword(
+	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(password),
 		bcrypt.DefaultCost,
 	)
@@ -45,5 +62,11 @@ func (s *AuthService) Register(phone string, password string) error {
 		return fmt.Errorf("failed to hash password")
 	}
 
-	return nil
+	user = &model.User{
+		Phone:        phone,
+		PasswordHash: string(passwordHash),
+	}
+
+	return s.userRepository.Create(user)
 }
+

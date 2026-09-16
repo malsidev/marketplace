@@ -1,12 +1,39 @@
 package repository
 
+import (
+	"auth/internal/model"
+
+	"gorm.io/gorm"
+)
+
 type User struct {
 	Id           int
 	Phone        string
 	PasswordHash string
 }
 
-type UserRepository interface {
-	Create(user User) error
-	GetByUsername(phone string) (*User, error)
+type UserRepository struct {
+	db *gorm.DB
+}
+
+func NewUserRepository(db *gorm.DB) *UserRepository {
+	return &UserRepository{
+		db: db,
+	}
+}
+
+func (r *UserRepository) Create(user *model.User) error{
+	return r.db.Create(user).Error
+}
+
+func (r * UserRepository) GetByPhone(phone string) (*model.User, error) {
+	var user model.User
+
+	err := r.db.Where("phone= ?", phone).First(&user).Error
+
+	if err != nil{
+		return nil, err
+	}
+	return &user, nil
+
 }
