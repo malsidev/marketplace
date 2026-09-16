@@ -12,6 +12,7 @@ import (
 	"auth/internal/service"
 	"auth/internal/repository"
 )
+
 func main() {
 	// Загружаем конфигурацию из .env
 	cfg := config.Load()
