@@ -41,6 +41,6 @@ func main() {
 	// Запускаем сервер
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 }
