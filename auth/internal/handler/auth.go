@@ -59,3 +59,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Message: "user registered",
 	})
 }
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request){
+	
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"fmt"
 
 	"auth/internal/config"
 	"auth/internal/database"
@@ -34,6 +35,7 @@ func main() {
 	// Auth routes
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/reg", AuthHandler.Register)
+		r.Post("/log", AuthHandler.Login)
 	})
 
 	log.Println("server started on :8000")
