@@ -63,7 +63,7 @@ Note: The architecture is currently under development and may change as the proj
 Planned Architecture
 
 <p align="center">
-  <img src="./архитектура_маркетплейса.jpg" alt="Marketplace Architecture" width="100%">
+  <img src="./архитектура_маркет_плейса.jpg" alt="Marketplace Architecture" width="100%">
 </p>
 
 The architecture includes separate services for authentication, catalog, orders, inventory, analytics and recommendations, as well as infrastructure components for caching, messaging and data processing.
