@@ -16,6 +16,11 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 }
 
+type LoginRequest struct {
+	Phone string `json:"phone"`
+	Password string `json:"password"`
+}
+
 type MessageResponse struct {
 	Message string `json:"message"`
 }
@@ -60,6 +65,36 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request){
-	
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var request LoginRequest
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		json.NewEncoder(w).Encode(MessageResponse{
+			Message: "invalid JSON",
+		})
+
+		return
+	}
+
+	err = h.authService.Login(request.Phone, request.Password)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		json.NewEncoder(w).Encode(MessageResponse{
+			Message: err.Error(),
+		})
+
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(MessageResponse{
+		Message: "user logged in",
+	})
 }

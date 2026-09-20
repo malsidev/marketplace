@@ -25,7 +25,7 @@ func (s *AuthService) Register(phone string, password string) error {
 	user, err := s.userRepository.GetByPhone(phone)
 
 	if err == nil {
-		return fmt.Errorf("the phone number is busy")
+		return fmt.Errorf("invalid phone or password")
 	}
 
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -108,8 +108,6 @@ func (s *AuthService) Login(phone string, password string) error {
 	if err != nil {
 		return fmt.Errorf("failed to hash password")
 	}
-
-
 
 	return nil
 }
