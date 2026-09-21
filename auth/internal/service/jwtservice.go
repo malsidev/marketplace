@@ -10,21 +10,31 @@ type JWTService struct {
 	secret []byte
 }
 
+type Claims struct {
+	UserID int `json:"sub"`
+	Type string `json:"type"`
+	jwt.RegisteredClaims
+}
+
 func NewJWTService(secret string) *JWTService {
 	return &JWTService{
-		secret: [byte(secret)]
+		secret: []byte(secret),
 	}
 }
 
-func (j *JWTService) GenerateToken(userID uint) (string, error) {
-	claims := jwt.MapClaims{
-		"sub" : userID,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(15 * time.Minute).Unix(),
+func (j *JWTService) GenerateToken(userID int) (string, error) {
+	claims := Claims{
+		UserID: userID,
+		Type:   "access",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "marketplace-auth",
+		},
 	}
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		claims
+		claims,
 	)
 
 	return token.SignedString(j.secret)

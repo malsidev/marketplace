@@ -15,10 +15,10 @@ import (
 )
 
 func main() {
-	// Загружаем конфигурацию из .env
+	
 	cfg := config.Load()
 
-	// Подключаемся к PostgreSQL
+	
 	db, err := database.NewPostgres(cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -26,12 +26,13 @@ func main() {
 
 	log.Println("database connected:", db != nil)
 
-	// Создаём роутер
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	jwtService := service.NewJWTService(cfg.JWTSecret)
 	UserRepository := repository.NewUserRepository(db)
-	authService := service.NewAuthService(UserRepository)
+	authService := service.NewAuthService(UserRepository, jwtService)
 	AuthHandler := handler.NewAuthHandler(authService)
+
 	// Auth routes
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/reg", AuthHandler.Register)
@@ -40,7 +41,6 @@ func main() {
 
 	log.Println("server started on :8000")
 
-	// Запускаем сервер
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {
 		fmt.Println(err)

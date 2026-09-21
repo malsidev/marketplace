@@ -81,9 +81,9 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.authService.Login(request.Phone, request.Password)
+	token, err := h.authService.Login(request.Phone, request.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 
 		json.NewEncoder(w).Encode(MessageResponse{
 			Message: err.Error(),
@@ -92,9 +92,9 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(MessageResponse{
-		Message: "user logged in",
+	json.NewEncoder(w).Encode(map[string]string{
+		"access_token": token,
 	})
 }
