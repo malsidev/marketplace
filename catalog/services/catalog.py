@@ -1,2 +1,2 @@
-async def get_catalog():
-    pass
+async def catalog(data):
+    return {"mess" : data}

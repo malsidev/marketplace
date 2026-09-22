@@ -1,9 +1,12 @@
 from fastapi import FastAPI 
 
+from middleware.request_loging import requests_log
 from routers.init import setup_routers
 
 app  = FastAPI()
 
+
+app.middleware("http")(requests_log)
 setup_routers(app)
 
 @app.get("/")
