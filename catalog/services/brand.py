@@ -1,5 +1,8 @@
-from repositories.brand import addBrand
+from repositories.brand import addBrand, brand
 
 
-async def brand(data, db):
+async def postBrand(data, db):
     return await addBrand(data, db)
+
+async def getBrand(db):
+    return await brand(db)

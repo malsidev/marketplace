@@ -1,5 +1,8 @@
-from repositories.categories import addCategories
+from repositories.categories import addCategories, categories
 
 
-async def categories(data, db):
+async def getCategories(db):
+    return await categories(db)
+
+async def postCategories(data, db):
     return await addCategories(data, db)
