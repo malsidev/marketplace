@@ -6,12 +6,11 @@ A modern marketplace platform built with a production-oriented backend architect
 
 About
 
-Marketplace — это проект разработки собственного маркетплейса с современной и масштабируемой архитектурой.
+Marketplace — Is a project to develop your own marketplace with a modern and scalable architecture.
 
-Основная цель проекта — создать полноценную backend-систему, используя подходы и технологии, применяемые в реальных коммерческих проектах.
+The main goal of the project is to create a full-fledged backend system using approaches and technologies used in real commercial projects.
 
-Проект находится в активной разработке, поэтому архитектура и функциональность постепенно расширяются.
-
+The project is under active development, so the architecture and functionality are gradually expanding.
 ⸻
 
 Tech Stack
@@ -37,9 +36,9 @@ Data & Infrastructure
 
 Architecture
 
-Проект строится на основе микросервисной архитектуры, где отдельные компоненты отвечают за различные части системы.
+The project is based on a microservice architecture, where individual components are responsible for various parts of the system.
 
-Архитектура предусматривает:
+The architecture provides:
 
 * Authentication
 * Catalog
@@ -75,10 +74,9 @@ The diagram will be updated as the architecture evolves.
 
 Development
 
-Проект находится в стадии разработки.
+The project is under development.
 
-Новые сервисы, функции и архитектурные решения добавляются постепенно по мере развития проекта.
-
+New services, functions and architectural solutions are added gradually as the project develops.
 ⸻
 
 Status: In Development
