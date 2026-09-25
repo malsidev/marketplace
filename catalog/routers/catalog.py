@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Depends, Header
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.catalog import catalog
+from database import get_db
+from services.catalog import getCatalog
 from schemas.schemas import Products
 
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 @router.get("")
 async def get_catalog(
-        product_data : Products,
+        db: AsyncSession = Depends(get_db),
         user_id: str | None = Header(default=None, alias="X-User-ID"),
 ):
-    return await catalog(product_data)
+    return await getCatalog(db)

@@ -21,5 +21,5 @@ async def post_products(
     return await postProducts(name, description, brand_id, category_id, image, db)
 
 @router.post("/{product_id}/images")
-async def post_products_images(product_id : int, images: list[UploadFile] = File(...)):
-    return await postProductsImages(product_id,  [image.filename for image in images])
+async def post_products_images(product_id : int, images: UploadFile = File(...)):
+    return await postProductsImages(product_id,  images)
