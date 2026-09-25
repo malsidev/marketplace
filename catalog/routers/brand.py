@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Header, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
+from database.pgdb import get_db
 from services.brand import postBrand, getBrand
 from schemas.schemas import Brands
 

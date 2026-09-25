@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from middleware.request_loging import requests_log
 from routers.init import setup_routers
-from services.minio import create_bucket_if_not_exists
+from database.miniodb import create_bucket_if_not_exists
 
 app  = FastAPI()
 

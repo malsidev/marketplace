@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Header, UploadFile, File, Form, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
+from database.pgdb import get_db
 from services.products import postProducts, postProductsImages
 from schemas.schemas import Products
 

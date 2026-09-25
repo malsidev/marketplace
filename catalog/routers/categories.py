@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, Header, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
+from database.pgdb import get_db
 from services.categories import addCategories, getCategories
 from schemas.schemas import Categories
 
