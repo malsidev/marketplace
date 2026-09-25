@@ -1,4 +1,4 @@
-from repositories.categories import addCategories, categories
+from repositories.category import addCategories, categories
 
 
 async def getCategories(db):

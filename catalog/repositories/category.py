@@ -3,16 +3,16 @@ from models.models import Categories
 from sqlalchemy.ext.asyncio import AsyncSession
 
 async def addCategories(data, db: AsyncSession):
-    brand = Categories(
+    categories = Categories(
         name = data.name
     )
-    db.add(brand)
+    db.add(categories)
 
     await db.commit()
-    await db.refresh(brand)
+    await db.refresh(categories)
 
     return {
-        "id": brand.id
+        "id": categories.id
     }
 
 async def categories(db: AsyncSession):

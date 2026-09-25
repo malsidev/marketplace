@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Header, Depends
+from fastapi import APIRouter, Form, Header, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from services.categories import categories, getCategories
+from services.categories import addCategories, getCategories
 from schemas.schemas import Categories
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -13,9 +13,9 @@ async def get_categories(db: AsyncSession = Depends(get_db), user_id: str | None
 
 @router.post("")
 async def post_categories(
-        categories_data : Categories,
+        data: Categories,
         db: AsyncSession = Depends(get_db),
         user_id: str | None = Header(default=None, alias="X-User-ID")
         
 ):
-    return await categories(categories_data, db)
+    return await addCategories(data, db)
