@@ -14,9 +14,6 @@ async def get_catalog(
         user_id: str | None = Header(default=None, alias="X-User-ID"),
 ):
 
-    cached = await redis.get("catalog")
-    if cached:
-        return json.loads(cached)
     
     return await getCatalog(db)
  

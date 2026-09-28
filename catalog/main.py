@@ -1,14 +1,28 @@
 from fastapi import FastAPI 
 
+from contextlib import asynccontextmanager
 from middleware.request_loging import requests_log
 from routers.init import setup_routers
 from database.miniodb import create_bucket_if_not_exists
 
-app  = FastAPI()
+from database.kafka_client import producer
+
+
+
+
+@asynccontextmanager
+async def lifspan(app: FastAPI):
+    await producer.start()
+    yield
+    await producer.stop()
+
+app  = FastAPI(lifespan=lifspan)
+
 
 @app.on_event("startup")
 async def startup():
     create_bucket_if_not_exists()
+
 
 app.middleware("http")(requests_log)
 setup_routers(app)
