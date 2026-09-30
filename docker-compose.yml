@@ -21,6 +21,7 @@ services:
   minio:
     image: quay.io/minio/minio
     container_name: minio
+
     command: server /data --console-address ":9001"
 
     ports:
@@ -33,6 +34,7 @@ services:
 
     volumes:
       - minio_data:/data
+
 
   kafka:
     image: apache/kafka:3.9.1
@@ -65,7 +67,24 @@ services:
       timeout: 3s
       retries: 10
 
-  
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: analytics-clickhouse
+
+    ports:
+      - "8123:8123"
+      - "9002:9000"
+
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+
+    restart: unless-stopped
+
+
 volumes:
   postgres_data:
   minio_data:
+  clickhouse_data:
+  clickhouse_logs:

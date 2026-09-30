@@ -23,6 +23,7 @@ func NewConsumer(brokers []string, topic string, groupID string) *Consumer {
 	}
 }
 
+
 func (c *Consumer) Start(ctx context.Context) {
 	for {
 		message, err := c.reader.ReadMessage(ctx)
