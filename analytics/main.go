@@ -20,9 +20,13 @@ func main() {
 	defer consumer.Close()
 
 	log.Println("kafka started")
-	consumer.Start(ctx)
-
+	go consumer.Start(ctx)
 	ch := clickhouse.New()
+
+	err := ch.Ping(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Println("Connected to ClickHouse")
 
@@ -33,6 +37,11 @@ func main() {
 		Path:       "/products",
 		StatusCode: 200,
 		DurationMs: 42.5,
+	}
+
+	err = ch.InsertRequest(ctx, request)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("Request inserted")

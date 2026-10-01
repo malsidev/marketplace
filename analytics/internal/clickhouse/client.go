@@ -13,11 +13,11 @@ type Client struct {
 
 func New() *Client {
 	conn, err := clickhouse.Open(&clickhouse.Options{
-		Addr: []string{"clickhouse:9000"},
+		Addr: []string{"localhost:9002"},
 		Auth: clickhouse.Auth{
 			Database: "default",
 			Username: "default",
-			Password: "",
+			Password: "default",
 		},
 	})
 
