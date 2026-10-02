@@ -12,3 +12,11 @@ type Request struct {
 	StatusCode uint16
 	DurationMs float64
 }
+type LogEvent struct {
+	Timestamp  time.Time
+	UserID     string
+	Method     string
+	Path       string
+	StatusCode int
+	DurationMs float64
+}

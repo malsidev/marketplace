@@ -1,7 +1,9 @@
 package kafka
 
 import (
+	"analytics/internal/models"
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/segmentio/kafka-go"
@@ -22,25 +24,23 @@ func NewConsumer(brokers []string, topic string, groupID string) *Consumer {
 		reader: reader,
 	}
 }
-
-
-func (c *Consumer) Start(ctx context.Context) {
-	for {
+func (c *Consumer) GetBatch(ctx context.Context, size int) ([]models.Request, error) {
+	batch := make([]models.Request, 0, size)
+	log.Println(batch)
+	for len(batch) < size {
 		message, err := c.reader.ReadMessage(ctx)
+		log.Println("RAW KAFKA:", string(message.Value))
 		if err != nil {
-			log.Println("Kafka err", err)
-			return
+			return nil, err
 		}
 
-		log.Println(
-			"kafla message:",
-			message.Topic,
-			message.Partition,
-			message.Offset,
-			string(message.Value),
-		)
+		var event models.Request
+
+		err = json.Unmarshal(message.Value, &event)
+		if err != nil {
+			return nil, err
+		}
+		batch = append(batch, event)
 	}
-}
-func (c *Consumer) Close() error {
-	return c.reader.Close()
+	return batch, nil
 }

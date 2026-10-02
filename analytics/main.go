@@ -3,46 +3,38 @@ package main
 import (
 	"analytics/internal/clickhouse"
 	"analytics/internal/kafka"
-	"analytics/internal/models"
 	"context"
 	"log"
-	"time"
 )
 
 func main() {
 	ctx := context.Background()
-
 	consumer := kafka.NewConsumer(
 		[]string{"localhost:9092"},
 		"log_users",
 		"analytics",
 	)
-	defer consumer.Close()
+	clickhouse := clickhouse.New()
 
-	log.Println("kafka started")
-	go consumer.Start(ctx)
-	ch := clickhouse.New()
+	for {
 
-	err := ch.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
+		batch, err := consumer.GetBatch(ctx, 10)
+		if err != nil {
+			log.Println("Kafka error:", err)
+			return
+		}
+
+		for _, event := range batch {
+			log.Printf("EVENT: %+v\n", event)
+		}
+		log.Println("Получили сообщений:", len(batch))
+
+		err = clickhouse.InsertBatch(ctx, batch)
+		if err != nil {
+			log.Println("ClickHouse error:", err)
+			return
+		}
+
+		log.Println("Batch inserted into ClickHouse")
 	}
-
-	log.Println("Connected to ClickHouse")
-
-	request := models.Request{
-		Timestamp:  time.Now(),
-		UserID:     15,
-		Method:     "GET",
-		Path:       "/products",
-		StatusCode: 200,
-		DurationMs: 42.5,
-	}
-
-	err = ch.InsertRequest(ctx, request)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Request inserted")
 }

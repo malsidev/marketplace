@@ -5,29 +5,32 @@ import (
 	"context"
 )
 
-func (c *Client) InsertRequest(
+func (c *Client) InsertBatch(
 	ctx context.Context,
-	request models.Request,
+	events []models.Request,
 ) error {
-	return c.conn.Exec(
+	batch, err := c.conn.PrepareBatch(
 		ctx,
-		`
-		INSERT INTO requests
-		(
-			timestamp,
-			user_id,
-			method,
-			path,
-			status_code,
-			duration_ms
-		)
-		VALUES (?, ?, ?, ?, ?, ?)
-		`,
-		request.Timestamp,
-		request.UserID,
-		request.Method,
-		request.Path,
-		request.StatusCode,
-		request.DurationMs,
+		"INSERT INTO requests",
 	)
+	if err != nil {
+		return err
+	}
+
+	for _, event := range events {
+		err := batch.Append(
+			event.Timestamp,
+			event.UserID,
+			event.Method,
+			event.Path,
+			event.StatusCode,
+			event.DurationMs,
+		)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return batch.Send()
 }
