@@ -9,7 +9,7 @@ type Request struct {
 	UserID     int
 	Method     string
 	Path       string
-	StatusCode uint16
+	StatusCode int
 	DurationMs float64
 }
 type LogEvent struct {

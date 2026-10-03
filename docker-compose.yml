@@ -72,6 +72,11 @@ services:
     image: clickhouse/clickhouse-server:latest
     container_name: analytics-clickhouse
 
+
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: default
+
     ports:
       - "8123:8123"
       - "9002:9000"

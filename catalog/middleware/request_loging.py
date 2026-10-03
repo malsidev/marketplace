@@ -23,8 +23,10 @@ async def requests_log(request: Request, call_next):
 
     message = {
         "event": "action",
-        "user_id": user_id,
-        "url": request.url.path,
+        "UserID": int(user_id),
+        "Method": request.method,
+        "Path": request.url.path,
+        "StatusCode": response.status_code
     }
     try:
         await producer.send(
