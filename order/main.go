@@ -1,9 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+
+	"order/routers"
 )
 
 func main() {
-	fmt.Println("Order")
+	r := routers.New()
+
+	log.Println("cerver run")
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
