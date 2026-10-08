@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"order/models"
+	"order/repository"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -17,10 +19,20 @@ type MessageResponse struct {
 	Message string `json:"message"`
 }
 
-func OrderRouters() chi.Router {
+type RouterOrder struct {
+	orderRepository *repository.OrderRepository
+}
+
+func NewRouterOrder(orderRepository *repository.OrderRepository) *RouterOrder {
+	return &RouterOrder{
+		orderRepository: orderRepository,
+	}
+}
+
+func (ro *RouterOrder) OrderRouters() chi.Router {
 	r := chi.NewRouter()
 	r.Get("/", getOrder)
-	r.Post("/", postOrder)
+	r.Post("/", ro.postOrder)
 	return r
 }
 
@@ -29,9 +41,8 @@ func getOrder(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("phone"))
 }
 
-func postOrder(w http.ResponseWriter, r *http.Request) {
+func (re *RouterOrder) postOrder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	var request Product
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -44,4 +55,20 @@ func postOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(request)
+
+	data := &models.Orders{
+		ID:       request.ID,
+		Quantity: request.Quantity,
+	}
+
+	err = re.orderRepository.Create(data)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		json.NewEncoder(w).Encode(MessageResponse{
+			Message: "failed to create order",
+		})
+
+		return
+	}
 }
