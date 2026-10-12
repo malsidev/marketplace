@@ -19,29 +19,29 @@ type MessageResponse struct {
 	Message string `json:"message"`
 }
 
-type RouterOrder struct {
-	orderRepository *repository.OrderRepository
+type RouterCart struct {
+	cartRepository *repository.CartRepository
 }
 
-func NewRouterOrder(orderRepository *repository.OrderRepository) *RouterOrder {
-	return &RouterOrder{
-		orderRepository: orderRepository,
+func NewRouterCart(cartRepository *repository.CartRepository) *RouterCart {
+	return &RouterCart{
+		cartRepository: cartRepository,
 	}
 }
 
-func (ro *RouterOrder) OrderRouters() chi.Router {
+func (ro *RouterCart) CartRouters() chi.Router {
 	r := chi.NewRouter()
-	r.Get("/", getOrder)
-	r.Post("/", ro.postOrder)
+	r.Get("/", getCart)
+	r.Post("/", ro.postCart)
 	return r
 }
 
-func getOrder(w http.ResponseWriter, r *http.Request) {
+func getCart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("phone", r.Body)
 	w.Write([]byte("phone"))
 }
 
-func (re *RouterOrder) postOrder(w http.ResponseWriter, r *http.Request) {
+func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request Product
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -56,12 +56,12 @@ func (re *RouterOrder) postOrder(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(request)
 
-	data := &models.Orders{
+	data := &models.Cart{
 		ID:       request.ID,
 		Quantity: request.Quantity,
 	}
 
-	err = re.orderRepository.Create(data)
+	err = re.cartRepository.Create(data)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 

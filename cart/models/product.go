@@ -1,6 +1,6 @@
 package models
 
-type Orders struct {
+type Cart struct {
 	ID       int `gorm:"primarykey"`
 	Quantity int `gorm:"not null"`
 }

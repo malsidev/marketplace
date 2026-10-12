@@ -15,11 +15,11 @@ func New(db *gorm.DB) http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	orderRepository := repository.NewOrderRepository(db)
-	orderRouter := NewRouterOrder(orderRepository)
+	cartRepository := repository.NewCartRepository(db)
+	cartRouter := NewRouterCart(cartRepository)
 
 	r.Route("/", func(r chi.Router) {
-		r.Mount("/order", orderRouter.OrderRouters())
+		r.Mount("/cart", cartRouter.CartRouters())
 	})
 
 	return r
