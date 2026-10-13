@@ -11,7 +11,8 @@ import (
 )
 
 type Product struct {
-	ID       int `json:"id"`
+	CartID   int `json:"CartID"`
+	UserID   int `json:"UserID"`
 	Quantity int `json:"quantity"`
 }
 
@@ -37,8 +38,7 @@ func (ro *RouterCart) CartRouters() chi.Router {
 }
 
 func getCart(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("phone", r.Body)
-	w.Write([]byte("phone"))
+
 }
 
 func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
@@ -56,12 +56,18 @@ func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(request)
 
-	data := &models.Cart{
-		ID:       request.ID,
-		Quantity: request.Quantity,
+	cart := &models.Carts{
+		UserID: request.UserID,
 	}
 
-	err = re.cartRepository.Create(data)
+	cart_items := &models.CartItem{
+		CartID:    cart.ID,
+		ProductID: request.CartID,
+		Quantity:  request.Quantity,
+	}
+
+	err = re.cartRepository.CreateCartWithItem(cart, cart_items)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 
@@ -71,4 +77,5 @@ func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	w.WriteHeader(http.StatusCreated)
 }

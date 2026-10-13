@@ -23,7 +23,7 @@ async def requests_log(request: Request, call_next):
 
     message = {
         "event": "action",
-        "UserID": int(user_id),
+        "UserID": int(user_id) if user_id is not None else None,
         "Method": request.method,
         "Path": request.url.path,
         "StatusCode": response.status_code
