@@ -40,3 +40,13 @@ func (r *CartRepository) CreateCartWithItem(cart *models.Carts, item *models.Car
 		return nil
 	})
 }
+
+func (r *CartRepository) GetCart(id int) (*models.Carts, error) {
+	var user models.Carts
+
+	err := r.db.Where("user_id=?", id).Take(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

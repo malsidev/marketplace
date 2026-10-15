@@ -16,6 +16,10 @@ type Product struct {
 	Quantity int `json:"quantity"`
 }
 
+type Cart struct {
+	UserID int `json:"UserID"`
+}
+
 type MessageResponse struct {
 	Message string `json:"message"`
 }
@@ -32,12 +36,33 @@ func NewRouterCart(cartRepository *repository.CartRepository) *RouterCart {
 
 func (ro *RouterCart) CartRouters() chi.Router {
 	r := chi.NewRouter()
-	r.Get("/", getCart)
+	r.Get("/", ro.getCart)
 	r.Post("/", ro.postCart)
 	return r
 }
 
-func getCart(w http.ResponseWriter, r *http.Request) {
+func (re *RouterCart) getCart(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var request Cart
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(MessageResponse{
+			Message: "invalid JSON",
+		})
+
+		return
+	}
+
+	userID, err := re.cartRepository.GetCart(request.UserID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(MessageResponse{Message: "failed to get cart"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]int{"user_id": userID.UserID})
 
 }
 
