@@ -4,7 +4,7 @@ from database.pgdb import get_db
 from services.brand import postBrand, getBrand
 from schemas.schemas import Brands
 
-router = APIRouter(prefix="/brand", tags=["prand"])
+router = APIRouter(prefix="/brand", tags=["brand"])
 
 @router.get("")
 async def get_brand(db: AsyncSession = Depends(get_db), user_id: str | None = Header(default=None, alias="X-User-ID")):

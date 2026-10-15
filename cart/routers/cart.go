@@ -11,9 +11,9 @@ import (
 )
 
 type Product struct {
-	CartID   int `json:"CartID"`
-	UserID   int `json:"UserID"`
-	Quantity int `json:"quantity"`
+	UserID    int `json:"UserID"`
+	ProductID int `json:"ProductID"`
+	Quantity  int `json:"quantity"`
 }
 
 type Cart struct {
@@ -43,27 +43,21 @@ func (ro *RouterCart) CartRouters() chi.Router {
 
 func (re *RouterCart) getCart(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var request Cart
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(MessageResponse{
-			Message: "invalid JSON",
-		})
 
+	var request Cart
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, `{"message":"invalid JSON"}`, http.StatusBadRequest)
 		return
 	}
 
-	userID, err := re.cartRepository.GetCart(request.UserID)
+	items, err := re.cartRepository.GetCart(request.UserID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(MessageResponse{Message: "failed to get cart"})
+		http.Error(w, `{"message":"failed to get cart"}`, http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]int{"user_id": userID.UserID})
-
+	json.NewEncoder(w).Encode(items)
 }
 
 func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +81,7 @@ func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
 
 	cart_items := &models.CartItem{
 		CartID:    cart.ID,
-		ProductID: request.CartID,
+		ProductID: request.ProductID,
 		Quantity:  request.Quantity,
 	}
 
