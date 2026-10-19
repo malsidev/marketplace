@@ -1,7 +1,8 @@
 from fastapi import APIRouter
+from schemas.schemas import CartProductRequest
 
 router = APIRouter(prefix="/cart", tags=["cart"])
 
-@router.get("/{product_id}")
-async def get_data_cart(product_id: int):
-    return {"mess" : product_id}
+@router.post("")
+async def get_data_cart(data: CartProductRequest):
+    return {"mess" : data}

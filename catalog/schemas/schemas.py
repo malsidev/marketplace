@@ -11,3 +11,10 @@ class Brands(BaseModel):
 
 class Categories(BaseModel):
     name: str
+
+class CartProduct(BaseModel):
+    product_id : int
+    quantity : int
+
+class CartProductRequest(BaseModel):
+    items: list[CartProduct]

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"order/models"
 	"order/repository"
+	"order/service"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -56,8 +57,23 @@ func (re *RouterCart) getCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	productItems := make([]service.CartItemRequest, 0, len(items))
+
+	for _, item := range items {
+		productItems = append(productItems, service.CartItemRequest{
+			ProductID: item.ProductID,
+			Quantity:  item.Quantity,
+		})
+	}
+
+	product, err := service.GetProduct(productItems)
+	if err != nil {
+		http.Error(w, `{"message":"seeervice"}`, http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(items)
+	json.NewEncoder(w).Encode(product)
 }
 
 func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {

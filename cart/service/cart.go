@@ -1,28 +1,46 @@
 package service
 
-// import (
-// 	"order/models"
-// 	"order/repository"
-// )
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+)
 
-// type CartService struct {
-// 	cartRepository *repository.CartRepository
-// }
+type CartItemRequest struct {
+	ProductID int `json:"product_id"`
+	Quantity  int `json:"quantity"`
+}
 
-// func (s CartService) CheckCart(userid int) (*models.Carts, error) {
-// 	cart, err := s.cartRepository.CheckCart(userid)
+type ProductsRequest struct {
+	Items []CartItemRequest `json:"items"`
+}
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func GetProduct(items []CartItemRequest) ([]byte, error) {
+	data := ProductsRequest{
+		Items: items,
+	}
 
-// 	if cart != nil {
-// 		return cart, nil
-// 	}
+	body, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
 
-// 	cart = &models.Carts{
-// 		UserID: userid,
-// 	}
-// 	return cart, nil
+	resp, err := http.Post(
+		"http://127.0.0.1:8001/cart",
+		"application/json",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
-// }
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %d", resp.StatusCode)
+	}
+	fmt.Println(string(body))
+
+	return io.ReadAll(resp.Body)
+}
