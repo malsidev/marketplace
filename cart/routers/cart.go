@@ -29,6 +29,13 @@ type RouterCart struct {
 	cartRepository *repository.CartRepository
 }
 
+type CartProductResponse struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Quantity    int    `json:"quantity"`
+}
+
 func NewRouterCart(cartRepository *repository.CartRepository) *RouterCart {
 	return &RouterCart{
 		cartRepository: cartRepository,
@@ -72,8 +79,34 @@ func (re *RouterCart) getCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var products []struct {
+		ID          int    `json:"id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if err := json.Unmarshal(product, &products); err != nil {
+		http.Error(w, `{"message":"invalid catalog response"}`, http.StatusInternalServerError)
+		return
+	}
+
+	quantities := make(map[int]int, len(items))
+	for _, item := range items {
+		quantities[item.ProductID] = item.Quantity
+	}
+
+	response := make([]CartProductResponse, 0, len(products))
+	for _, p := range products {
+		response = append(response, CartProductResponse{
+			ID:          p.ID,
+			Name:        p.Name,
+			Description: p.Description,
+			Quantity:    quantities[p.ID],
+		})
+	}
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(product)
+	json.NewEncoder(w).Encode(response)
 }
 
 func (re *RouterCart) postCart(w http.ResponseWriter, r *http.Request) {
