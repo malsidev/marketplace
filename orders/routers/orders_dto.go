@@ -1,13 +1,11 @@
 package routers
 
 type Order struct {
-	OrderID int `json:"OrderID"`
+	UserID     int          `json:"UserID"`
+	OrderItems []OrderItems `json:"OrderItems"`
 }
 
-type OrderProductResponse struct {
-	ID        int `json:"OrderItemsID"`
-	OrderID   int `json:"OrderID"`
+type OrderItems struct {
 	ProductID int `json:"ProductID"`
 	Quantity  int `json:"Quantity"`
-	Price     int `json:"Price"`
 }

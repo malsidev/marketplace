@@ -22,6 +22,7 @@ func (ro *RouterOrders) orderRouters() http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/", ro.orderGet)
+	r.Post("/", ro.orderPost)
 
 	return r
 }
@@ -45,4 +46,9 @@ func (ro *RouterOrders) orderGet(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	json.NewEncoder(w).Encode(resp)
+}
+
+func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode("hello")
 }
