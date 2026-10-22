@@ -15,3 +15,9 @@ async def addProduct(name, description, brand_id, category_id, db: AsyncSession)
     await db.refresh(categories)
 
     return categories.id
+
+async def getProductPrice(id, db : AsyncSession):
+    stmt = select(Products.price).where(Products.id == id)
+    res = await db.execute(stmt)
+    request = res.scalars().all()
+    return request[0]

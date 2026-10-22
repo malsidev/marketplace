@@ -19,3 +19,11 @@ func (r *OrderRepo) GetOrder() ([]models.OrdersItems, error) {
 	err := r.db.Find(&items).Error
 	return items, err
 }
+
+/*
+func (r *OrderRepo) PostOrder(order *models.Orders, items *models.OrdersItems) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Create()
+	})
+}
+*/
