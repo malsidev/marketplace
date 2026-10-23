@@ -18,3 +18,6 @@ class CartProduct(BaseModel):
 
 class CartProductRequest(BaseModel):
     items: list[CartProduct]
+
+class ProductID(BaseModel):
+    product_id : list[int]

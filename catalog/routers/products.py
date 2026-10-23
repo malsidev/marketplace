@@ -2,7 +2,7 @@ from fastapi import APIRouter, Header, UploadFile, File, Form, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.pgdb import get_db
 from services.products import postProducts, postProductsImages
-from schemas.schemas import Products
+from schemas.schemas import ProductID
 from repositories.product import getProductPrice
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -25,10 +25,11 @@ async def post_products(
 async def post_products_images(product_id : int, images: UploadFile = File(...)):
     return await postProductsImages(product_id,  images)
 
-@router.get("/{id}")
+@router.post("/id")
 async def get_product(        
-    id : int,
+    product_id : ProductID,
     db: AsyncSession = Depends(get_db)
 
 ):
-    return await getProductPrice(id, db)
+    return product_id.product_id
+    # return await getProductPrice(product_id, db)

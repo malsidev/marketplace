@@ -1,8 +1,8 @@
 package routers
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -61,9 +61,31 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := 1
-	curl := fmt.Sprintf("http://127.0.0.1:8001/products/%d", id)
-	resp, err := http.Get(curl)
+	var orderItems []models.OrdersItems
+
+	ordres := models.Orders{
+		UserID: data.UserID,
+	}
+
+	var list_productID []int
+
+	for _, item := range data.OrderItems {
+		list_productID = append(list_productID, item.ProductID)
+	}
+
+	listID := ProductID{ProductID: list_productID}
+	jsonData, err := json.Marshal(listID)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	curl := "http://127.0.0.1:8001/products/id"
+	resp, err := http.Post(
+		curl,
+		"application/json",
+		bytes.Buffer(jsonData),
+	)
+
 	if err != nil {
 		log.Println("err")
 	}
@@ -73,26 +95,18 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 		log.Println("Ошибка чтения ответа:", err)
 		return
 	}
-
 	var price float64
 	if err := json.Unmarshal(body, &price); err != nil {
 		log.Println("Ошибка декодирования цены:", err)
 		return
 	}
 
-	ordres := models.Orders{
-		UserID:     data.UserID,
-		TotalPrice: int(price),
-	}
+	orderItems = append(orderItems, models.OrdersItems{
+		ProductID: item.ProductID,
+		Quantity:  item.Quantity,
+		Price:     int(price),
+	})
 
-	orderItems := models.OrdersItems{
-		ProductID: data.OrderItems[0].ProductID,
-		Quantity:  data.OrderItems[0].Quantity,
-	}
-
-	ro.orderRepo.PostOrder(&ordres, &orderItems)
-
-	log.Println("Статус:", resp.Status)
-	log.Println("Ответ:", string(body)) /* Ответ: 65000.0 */
+	ro.orderRepo.PostOrder(&ordres, orderItems)
 	json.NewEncoder(w).Encode(data)
 }

@@ -20,16 +20,27 @@ func (r *OrderRepo) GetOrder() ([]models.OrdersItems, error) {
 	return items, err
 }
 
-func (r *OrderRepo) PostOrder(order *models.Orders, items *models.OrdersItems) error {
+func (r *OrderRepo) PostOrder(order *models.Orders, items []models.OrdersItems) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
+		totalprice := 0
+
+		for i := range items {
+
+			totalprice += (items[i].Price * items[i].Quantity)
+		}
+
+		order.TotalPrice = totalprice
+
 		if err := tx.Create(order).Error; err != nil {
 			return err
 		}
 
-		items.OrderID = order.ID
+		for i := range items {
+			items[i].OrderID = order.ID
 
-		if err := tx.Create(items).Error; err != nil {
-			return err
+			if err := tx.Create(&items[i]).Error; err != nil {
+				return err
+			}
 		}
 
 		return nil
