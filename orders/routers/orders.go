@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"order/models"
 	"order/repo"
 
 	"github.com/go-chi/chi/v5"
@@ -64,17 +65,34 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 	curl := fmt.Sprintf("http://127.0.0.1:8001/products/%d", id)
 	resp, err := http.Get(curl)
 	if err != nil {
-		log.Fatalf("err")
+		log.Println("err")
 	}
 	defer resp.Body.Close()
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Ошибка чтения ответа:", err)
 		return
 	}
 
+	var price float64
+	if err := json.Unmarshal(body, &price); err != nil {
+		log.Println("Ошибка декодирования цены:", err)
+		return
+	}
+
+	ordres := models.Orders{
+		UserID:     data.UserID,
+		TotalPrice: int(price),
+	}
+
+	orderItems := models.OrdersItems{
+		ProductID: data.OrderItems[0].ProductID,
+		Quantity:  data.OrderItems[0].Quantity,
+	}
+
+	ro.orderRepo.PostOrder(&ordres, &orderItems)
+
 	log.Println("Статус:", resp.Status)
-	log.Println("Ответ:", string(body))
+	log.Println("Ответ:", string(body)) /* Ответ: 65000.0 */
 	json.NewEncoder(w).Encode(data)
 }

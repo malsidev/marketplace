@@ -1,4 +1,5 @@
 .env
 auth/.env
+sql
 
 alembic.ini
