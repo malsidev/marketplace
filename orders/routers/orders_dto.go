@@ -11,5 +11,5 @@ type OrderItems struct {
 }
 
 type ProductID struct {
-	ProductID []int `json:"ProductID"`
+	ProductID []int `json:"product_id"`
 }

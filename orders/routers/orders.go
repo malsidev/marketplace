@@ -3,6 +3,7 @@ package routers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -83,7 +84,7 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post(
 		curl,
 		"application/json",
-		bytes.Buffer(jsonData),
+		bytes.NewBuffer(jsonData),
 	)
 
 	if err != nil {
@@ -95,17 +96,19 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 		log.Println("Ошибка чтения ответа:", err)
 		return
 	}
-	var price float64
+	fmt.Println(body)
+	var price []float64
+	fmt.Println(price)
 	if err := json.Unmarshal(body, &price); err != nil {
 		log.Println("Ошибка декодирования цены:", err)
 		return
 	}
-
-	orderItems = append(orderItems, models.OrdersItems{
-		ProductID: item.ProductID,
-		Quantity:  item.Quantity,
-		Price:     int(price),
-	})
+	for _, item := range data.OrderItems {
+		orderItems = append(orderItems, models.OrdersItems{
+			ProductID: item.ProductID,
+			Quantity:  item.Quantity,
+		})
+	}
 
 	ro.orderRepo.PostOrder(&ordres, orderItems)
 	json.NewEncoder(w).Encode(data)
