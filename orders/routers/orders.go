@@ -97,16 +97,18 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(body)
-	var price []float64
-	fmt.Println(price)
+	var price []RespProductData
 	if err := json.Unmarshal(body, &price); err != nil {
 		log.Println("Ошибка декодирования цены:", err)
 		return
 	}
-	for _, item := range data.OrderItems {
+	fmt.Println(price)
+
+	for i, item := range data.OrderItems {
 		orderItems = append(orderItems, models.OrdersItems{
 			ProductID: item.ProductID,
 			Quantity:  item.Quantity,
+			Price:     int(price[i].Price),
 		})
 	}
 

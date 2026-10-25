@@ -13,3 +13,8 @@ type OrderItems struct {
 type ProductID struct {
 	ProductID []int `json:"product_id"`
 }
+
+type RespProductData struct {
+	ProductID int     `json:"ProductID"`
+	Price     float64 `json:"Price"`
+}
