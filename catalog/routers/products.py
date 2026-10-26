@@ -33,4 +33,4 @@ async def get_product(
 ):
     print(product_id.product_id)
     return await getProductPrice(product_id.product_id, db)
-    # return await getProductPrice(product_id, db)
+    

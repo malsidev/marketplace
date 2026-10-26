@@ -7,8 +7,8 @@ import (
 type Orders struct {
 	ID         int `gorm:"primarykey"`
 	UserID     int
-	Status     string
-	TotalPrice int
+	Status     string `gorm:"default:pending"`
+	TotalPrice float64
 	CreatedAt  time.Time
 
 	OrderItem []OrdersItems `gorm:"foreignKey:OrderID"`
@@ -19,7 +19,7 @@ type OrdersItems struct {
 	OrderID   int
 	ProductID int
 	Quantity  int
-	Price     int
+	Price     float64
 }
 
 /*

@@ -28,34 +28,13 @@ func (ro *RouterOrders) orderRouters() http.Handler {
 
 	// r.Get("/", ro.orderGet)
 	r.Post("/", ro.orderPost)
+	r.Get("/", ro.orderGet)
 
 	return r
 }
 
-// func (ro *RouterOrders) orderGet(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	items, err := ro.orderRepo.GetOrder()
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	resp := make([]OrderProductResponse, 0, len(items))
-
-// 	for _, i := range items {
-// 		resp = append(resp, Orderfunc (r *OrderRepo) PostOrder(order *models.Orders, items *models.OrdersItems) error {
-// 			ID:        i.ID,
-// 			OrderID:   i.OrderID,
-// 			ProductID: i.ProductID,
-// 			Quantity:  i.Quantity,
-// 			Price:     i.Price,
-// 		})
-// 	}
-// 	json.NewEncoder(w).Encode(resp)
-// }
-
 func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	var data Order
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		http.Error(w, `{"message":"invalid JSON"}`, http.StatusBadRequest)
@@ -63,13 +42,11 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var orderItems []models.OrdersItems
-
 	ordres := models.Orders{
 		UserID: data.UserID,
 	}
 
 	var list_productID []int
-
 	for _, item := range data.OrderItems {
 		list_productID = append(list_productID, item.ProductID)
 	}
@@ -102,16 +79,54 @@ func (ro *RouterOrders) orderPost(w http.ResponseWriter, r *http.Request) {
 		log.Println("Ошибка декодирования цены:", err)
 		return
 	}
-	fmt.Println(price)
 
 	for i, item := range data.OrderItems {
 		orderItems = append(orderItems, models.OrdersItems{
 			ProductID: item.ProductID,
 			Quantity:  item.Quantity,
-			Price:     int(price[i].Price),
+			Price:     float64(price[i].Price),
 		})
 	}
 
 	ro.orderRepo.PostOrder(&ordres, orderItems)
 	json.NewEncoder(w).Encode(data)
+}
+
+func (ro *RouterOrders) orderGet(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var data OrderGet
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		http.Error(w, `{"message":"invalid JSON"}`, http.StatusBadRequest)
+		return
+	}
+
+	orders, err := ro.orderRepo.GetProduct(data.UserID)
+	if err != nil {
+		http.Error(w, `{"message":"invalid JSON"}`, http.StatusBadRequest)
+		return
+	}
+
+	var response []OrderResponse
+
+	for _, order := range orders {
+		for _, item := range order.OrderItem {
+			response = append(response, OrderResponse{
+				ID:         uint(order.ID),
+				Status:     order.Status,
+				TotalPrice: order.TotalPrice,
+				ProductID:  item.ProductID,
+				Price:      item.Price,
+				Quantity:   item.Quantity,
+			})
+		}
+	}
+
+	var list_productID []int
+
+	for _, i := range response {
+		list_productID = append(list_productID, i.ProductID)
+	}
+
+	fmt.Println(list_productID)
+	json.NewEncoder(w).Encode(response)
 }
