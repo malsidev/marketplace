@@ -23,7 +23,9 @@ async def getProductPrice(product_id, db : AsyncSession):
     return [
         {
             "ProductID" : data.id,
-            "Price" : data.price
+            "Name" : data.name,
+            "Price" : data.price,
+
         }
         for data in request
     ]

@@ -31,6 +31,8 @@ async def get_product(
     db: AsyncSession = Depends(get_db)
 
 ):
+    print("здусь")
     print(product_id.product_id)
     return await getProductPrice(product_id.product_id, db)
-    
+
+

@@ -126,7 +126,51 @@ func (ro *RouterOrders) orderGet(w http.ResponseWriter, r *http.Request) {
 	for _, i := range response {
 		list_productID = append(list_productID, i.ProductID)
 	}
+	listID := ProductID{ProductID: list_productID}
+	fmt.Println(listID)
+	jsonData, err := json.Marshal(listID)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	fmt.Println(list_productID)
+	curl := "http://127.0.0.1:8001/products/id"
+	resp, err := http.Post(
+		curl,
+		"application/json",
+		bytes.NewBuffer(jsonData),
+	)
+	if err != nil {
+		log.Println("Catalog request error:", err)
+		http.Error(w, `{"message":"catalog unavailable"}`, http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		http.Error(w, `{"message":"catalog returned an error"}`, http.StatusBadGateway)
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, `{"message":"failed to read catalog response"}`, http.StatusBadGateway)
+		return
+	}
+
+	var products []RespProductData
+	if err := json.Unmarshal(body, &products); err != nil {
+		http.Error(w, `{"message":"invalid catalog response"}`, http.StatusBadGateway)
+		return
+	}
+
+	nameByID := make(map[int]string, len(products))
+	for _, product := range products {
+		nameByID[product.ProductID] = product.Name
+	}
+
+	for i := range response {
+		response[i].Name = nameByID[response[i].ProductID]
+	}
+
 	json.NewEncoder(w).Encode(response)
 }

@@ -16,6 +16,7 @@ type ProductID struct {
 
 type RespProductData struct {
 	ProductID int     `json:"ProductID"`
+	Name      string  `json:"Name"`
 	Price     float64 `json:"Price"`
 }
 
@@ -28,6 +29,7 @@ type OrderResponse struct {
 	Status     string  `json:"status"`
 	TotalPrice float64 `json:"total_price"`
 	ProductID  int     `json:"product_id"`
+	Name       string  `json:"Name"`
 	Price      float64 `json:"price"`
 	Quantity   int     `json:"quantity"`
 }
