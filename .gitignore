@@ -3,3 +3,22 @@ auth/.env
 sql
 
 alembic.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# Local runtime
+*.log
+.DS_Store
+Thumbs.db

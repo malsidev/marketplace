@@ -6,6 +6,7 @@ import (
 
 	"order/config"
 	"order/database"
+	"order/models"
 	"order/routers"
 )
 
@@ -16,6 +17,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_ = db.Migrator().DropTable(&models.Carts{}, &models.CartItem{})
+	if err := db.AutoMigrate(&models.Carts{}, &models.CartItem{}); err != nil {
+		log.Fatal(err)
+	}
+
 	log.Println("database connected", db != nil)
 	r := routers.New(db)
 

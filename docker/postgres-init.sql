@@ -1,0 +1,2 @@
+CREATE DATABASE marketpace;
+CREATE DATABASE users;
